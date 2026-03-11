@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TaskmindProvider } from "./providers";
 import { Header } from "./components/Header";
 
-const geistSans = Geist({
+const interSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -27,12 +27,12 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-50`}
+        className={`${interSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-50`}
       >
         <TaskmindProvider>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="mx-auto flex w-full max-w-6xl flex-1 px-4 py-6">
+            <main className="mx-auto flex w-full max-w-5xl flex-1 px-4 py-6">
               {children}
             </main>
           </div>
