@@ -5,6 +5,7 @@ import { useTaskmind } from '../providers';
 import { FiRefreshCcw, FiTarget } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
+import { useEffect, useState } from 'react';
 
 export default function HojePage() {
   const {
@@ -17,6 +18,13 @@ export default function HojePage() {
   } = useTaskmind();
 
   const tarefasDeHoje = tarefas.filter(t => t.data === hoje);
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  if (!mounted) return null
 
   return (
     <section className="flex w-full flex-col gap-6">
@@ -45,7 +53,7 @@ export default function HojePage() {
               {tarefasDeHoje.map(tarefa => (
                 <li
                   key={tarefa.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-800 bg-[#1B1B22] px-3 py-4"
+                  className="flex items-center justify-between rounded-lg border border-slate-800 bg-[#1B1B22] px-3 py-4 checked:bg-es,m"
                 >
                   <label className="flex cursor-pointer items-center gap-4 text-lg">
                     <input
@@ -72,9 +80,9 @@ export default function HojePage() {
 
         <div className='md:w-[100%] grid md:grid-cols-2 gap-5'>
           <div>
-            <h2 className="mb-3 text-lg font-medium text-slate-200">
-            🔁 Hábitos de hoje ({habitos.length})
-            </h2>
+          <h2 className="mb-4 text-lg font-medium text-slate-200">
+            🔁 Hábitos de hoje ({habitos?.length ?? 0})
+          </h2>
 
             {habitos.length === 0 ? (
               <p className="text-sm text-slate-400">
@@ -84,36 +92,40 @@ export default function HojePage() {
               <ul className="flex flex-col gap-2 w-full">
                 {habitos.map(habito => {
                   const concluido = habitoConcluidoNoDia(habito.id, hoje);
+
                   return (
-                    <div className="flex cursor-pointer items-center gap-4 text-lg">
-                      <li 
-                        key={habito.id}
-                        className="flex items-center justify-between rounded-lg border-1 border-slate-800 bg-[#1B1B22] px-3 py-3 transition hover:border-red-800 w-full"
-                      >
-                          <div className="flex gap-3 items-center">
+                    <li
+                      key={habito.id}
+                      className="rounded-lg border border-slate-800 bg-[#1B1B22] px-3 py-3 transition hover:border-red-800 hover:bg-[#202028] active:scale-[0.99]"
+                    >
+                      <label className="flex w-full cursor-pointer items-center justify-between">
+                        
+                        <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
                             checked={concluido}
                             onChange={() => alternarHabitoNoDia(habito.id, hoje)}
-                            className="h-6 w-6 appearance-none rounded-full border-2 border-slate-500  checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition"
+                            className="h-6 w-6 appearance-none rounded-full border-2 border-slate-500 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition"
                           />
+                  
                           <span
                             className={
                               concluido
-                                ? 'text-slate-400 line-through'
-                                : 'text-slate-100'
+                                ? "text-slate-400 line-through"
+                                : "text-slate-100"
                             }
                           >
                             {habito.titulo}
                           </span>
-                          </div>
-
-                          <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
-                            {habito.horario}
-                          </span>
-                      </li>
-                    </div>
-                  );
+                        </div>
+                  
+                        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
+                          {habito.horario}
+                        </span>
+                  
+                      </label>
+                    </li>
+                  )
                 })}
               </ul>
             )}
