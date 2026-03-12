@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TaskmindProvider } from "./providers";
 import { Header } from "./components/Header";
+import { PageTransition } from "./components/PageTransition";
 
 const interSans = Inter({
   variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="mx-auto flex w-full max-w-5xl flex-1 px-4 py-6">
-              {children}
+              <PageTransition>{children}</PageTransition>
             </main>
           </div>
         </TaskmindProvider>

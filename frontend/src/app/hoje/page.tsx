@@ -2,6 +2,9 @@
 
 import { FaFire, FaTasks } from 'react-icons/fa';
 import { useTaskmind } from '../providers';
+import { FiRefreshCcw, FiTarget } from 'react-icons/fi';
+import { BiTask } from 'react-icons/bi';
+import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
 
 export default function HojePage() {
   const {
@@ -83,7 +86,7 @@ export default function HojePage() {
                   const concluido = habitoConcluidoNoDia(habito.id, hoje);
                   return (
                     <div className="flex cursor-pointer items-center gap-4 text-lg">
-                      <li
+                      <li 
                         key={habito.id}
                         className="flex items-center justify-between rounded-lg border-1 border-slate-800 bg-[#1B1B22] px-3 py-3 transition hover:border-red-800 w-full"
                       >
@@ -130,27 +133,27 @@ export default function HojePage() {
               </div>
 
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
-                  <FaFire className="text-red-500 text-xl" />
+                <div className="p-3 rounded-lg bg-green-900/30 w-fit">
+                  <BiTask className="text-green-500 text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">0/0</span>
+                <span className="text-2xl font-semibold text-white">0/{tarefas.length}</span>
                 <p className="text-xs text-slate-400">Tarefas</p>
               </div>
 
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
-                  <FaFire className="text-red-500 text-xl" />
+                <div className="p-3 rounded-lg bg-yellow-900/30 w-fit">
+                  <FiRefreshCcw className="text-yellow-500 text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">0/6</span>
+                <span className="text-2xl font-semibold text-white">4/{habitos.length}</span>
                 <p className="text-xs text-slate-400">Hábitos</p>
               </div>
 
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
-                  <FaFire className="text-red-500 text-xl" />
+                <div className="p-3 rounded-lg bg-orange-900/30 w-fit">
+                  <FiTarget className="text-orange-500 text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">0</span>
-                <p className="text-xs text-slate-400">Sequência total</p>
+                <span className="flex items-center text-2xl font-semibold text-white">35 <MdOutlineKeyboardDoubleArrowUp color='#00C950'/></span> 
+                <p className="text-xs text-slate-400">Pontos da semana</p>
               </div>
 
             </div>
