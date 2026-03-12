@@ -1,6 +1,6 @@
 'use client';
 
-import { FaTasks } from 'react-icons/fa';
+import { FaFire, FaTasks } from 'react-icons/fa';
 import { useTaskmind } from '../providers';
 
 export default function HojePage() {
@@ -67,7 +67,7 @@ export default function HojePage() {
           )}
         </div>
 
-        <div className='md:w-[100%] grid grid-cols-2'>
+        <div className='md:w-[100%] grid md:grid-cols-2 gap-5'>
           <div>
             <h2 className="mb-3 text-lg font-medium text-slate-200">
             🔁 Hábitos de hoje ({habitos.length})
@@ -85,7 +85,7 @@ export default function HojePage() {
                     <div className="flex cursor-pointer items-center gap-4 text-lg">
                       <li
                         key={habito.id}
-                        className="flex items-center justify-between rounded-lg border-1 border-slate-800 bg-[#1B1B22] px-3 py-4 transition hover:border-red-800 w-full"
+                        className="flex items-center justify-between rounded-lg border-1 border-slate-800 bg-[#1B1B22] px-3 py-3 transition hover:border-red-800 w-full"
                       >
                           <div className="flex gap-3 items-center">
                           <input
@@ -116,7 +116,45 @@ export default function HojePage() {
             )}
           </div>
 
-          
+          <div className="flex flex-col">
+            <span className="mb-4 text-lg font-medium text-slate-200">📊 Resumo</span>
+
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+              
+              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
+                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
+                  <FaFire className="text-red-500 text-xl" />
+                </div>
+                <span className="text-2xl font-semibold text-white">0</span>
+                <p className="text-xs text-slate-400">Sequência total</p>
+              </div>
+
+              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
+                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
+                  <FaFire className="text-red-500 text-xl" />
+                </div>
+                <span className="text-2xl font-semibold text-white">0/0</span>
+                <p className="text-xs text-slate-400">Tarefas</p>
+              </div>
+
+              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
+                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
+                  <FaFire className="text-red-500 text-xl" />
+                </div>
+                <span className="text-2xl font-semibold text-white">0/6</span>
+                <p className="text-xs text-slate-400">Hábitos</p>
+              </div>
+
+              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
+                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
+                  <FaFire className="text-red-500 text-xl" />
+                </div>
+                <span className="text-2xl font-semibold text-white">0</span>
+                <p className="text-xs text-slate-400">Sequência total</p>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </section>
