@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## TaskMind
 
-## Getting Started
+O **TaskMind** é um projeto **open source** focado em organização pessoal, unindo tarefas, hábitos e visão do dia em um só lugar, com uma interface simples e agradável.
 
-First, run the development server:
+- **Hoje**: visão diária com tudo o que precisa ser feito (tarefas + hábitos do dia).
+- **Tarefas**: criação e acompanhamento das tarefas que você precisa resolver.
+- **Hábitos**: hábitos diários com horário definido e acompanhamento por calendário semanal.
+- **Outras áreas**: abas para bem-estar, academia, estudo, financeiro e configurações.
+
+Desenvolvido com **Next.js (App Router)**, **React**, **TypeScript** e **Tailwind CSS**, com animações suaves de transição entre páginas.
+
+---
+
+### Como rodar o projeto
+
+Na pasta `frontend`:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000` no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Open Source e contribuições
 
-## Learn More
+O TaskMind é mantido como um projeto **open source**.  
+Sugestões, issues e pull requests são bem-vindos para evoluir o produto.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Metas e próximas features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Relatórios com IA**: estatísticas de tarefas concluídas e sequência de hábitos.
+- **Modo foco/temporizador**: sessões de foco integradas à aba de estudo.
+- **Configurações avançadas**: personalização de temas, idioma e horários padrão.
+- **Sincronização na nuvem**: salvar dados do usuário em conta/log-in.
+- **Integrações externas**: conexão com calendário e notificações (desktop/mobile).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
