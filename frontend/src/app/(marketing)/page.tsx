@@ -203,7 +203,7 @@ export default function LandingPage() {
           Junte-se a centenas de pessoas que já estão transformando sua produtividade com o TaskMind.
         </p>
         <Link
-          href="/hoje"
+          href="/login"
           className="rounded-xl bg-red-500 px-10 py-5 font-bold text-slate-50 transition-all hover:bg-red-600 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25 active:scale-95"
         >
           Criar Minha Conta Grátis

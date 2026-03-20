@@ -1,14 +1,23 @@
-'use client';
-
 import { TaskmindProvider } from "../providers";
 import { Header } from "../components/Header";
 import { PageTransition } from "../components/PageTransition";
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
   return (
     <TaskmindProvider>
       <div className="flex min-h-screen flex-col">

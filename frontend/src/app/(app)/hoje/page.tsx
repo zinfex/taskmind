@@ -1,10 +1,10 @@
 'use client';
 
-import { FaFire, FaTasks } from 'react-icons/fa';
-import { FiRefreshCcw, FiTarget } from 'react-icons/fi';
+import { FaFire, FaTasks, FaCheckCircle } from 'react-icons/fa';
+import { FiRefreshCcw, FiTarget, FiCalendar, FiClock } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTaskmind } from '@/app/providers';
 
 export default function HojePage() {
@@ -17,162 +17,222 @@ export default function HojePage() {
     habitoConcluidoNoDia,
   } = useTaskmind();
 
-  const tarefasDeHoje = tarefas.filter(t => t.data === hoje);
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  const tarefasDeHoje = useMemo(() => tarefas.filter(t => t.data === hoje), [tarefas, hoje]);
+  const habitosDeHoje = habitos || [];
+
+  const tarefasConcluidas = tarefasDeHoje.filter(t => t.concluida).length;
+  const habitosConcluidos = habitosDeHoje.filter(h => habitoConcluidoNoDia(h.id, hoje)).length;
   
-  if (!mounted) return null
+  const totalItens = tarefasDeHoje.length + habitosDeHoje.length;
+  const totalConcluidos = tarefasConcluidas + habitosConcluidos;
+  const progressoTotal = totalItens > 0 ? Math.round((totalConcluidos / totalItens) * 100) : 0;
+
+  const dataFormatada = useMemo(() => {
+    return new Date().toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+  }, []);
+
+  if (!mounted) return null;
 
   return (
-    <section className="flex w-full flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold text-slate-50">Hoje</h1>
-        <p className="text-sm text-slate-400">
-          Veja em um só lugar suas tarefas e hábitos planejados para hoje (
-          {hoje}).
-        </p>
+    <div className="flex w-full flex-col gap-8 pb-10">
+      {/* Header com Boas-vindas e Progresso */}
+      <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
+            Bom dia! <span className="text-red-500">✨</span>
+          </h1>
+          <p className="flex items-center gap-2 text-slate-400">
+            <FiCalendar className="text-red-400" />
+            <span className="capitalize">{dataFormatada}</span>
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 min-w-[240px]">
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-slate-300">Progresso do dia</span>
+            <span className="text-red-400">{progressoTotal}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+            <div 
+              className="h-full bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-500 ease-out"
+              style={{ width: `${progressoTotal}%` }}
+            />
+          </div>
+        </div>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-1">
-        <div className="round ed-xl border border-red-800 rounded-lg p-4">
-          <h1 className="mb-3 text-lg font-medium text-slate-200">
-          📋 Tarefas para concluir ({tarefasDeHoje.length})
-          </h1>
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Coluna Principal: Tarefas e Hábitos */}
+        <div className="flex flex-col gap-8 lg:col-span-2">
+          
+          {/* Seção de Tarefas */}
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
+                <BiTask className="text-red-500 text-xl" />
+                Tarefas para hoje
+                <span className="ml-2 rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">
+                  {tarefasDeHoje.length}
+                </span>
+              </h2>
+            </div>
 
-          {tarefasDeHoje.length === 0 ? (
-            <p className="text-sm text-neutral-400 text-center">
-              <FaTasks className='text-neutral-700 text-5xl text-center justify-self-center mb-2'/>
-              Nenhuma tarefa cadastrada para hoje. Use a aba &quot;Tarefas&quot;
-              para adicionar.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {tarefasDeHoje.map(tarefa => (
-                <li
-                  key={tarefa.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-800 bg-[#1B1B22] px-3 py-4 checked:bg-es,m"
-                >
-                  <label className="flex cursor-pointer items-center gap-4 text-lg">
-                    <input
-                      type="checkbox"
-                      checked={tarefa.concluida}
-                      onChange={() => alternarTarefa(tarefa.id)}
-                      className="h-6 w-6 appearance-none rounded-full border-2 border-slate-500 bg-slate-900 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition"
-                    />  
-                    <span
-                      className={
-                        tarefa.concluida
-                          ? 'text-slate-400 line-through'
-                          : 'text-slate-100'
-                      }
-                    >
-                      {tarefa.titulo}
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className='md:w-[100%] grid md:grid-cols-2 gap-5'>
-          <div>
-          <h2 className="mb-4 text-lg font-medium text-slate-200">
-            🔁 Hábitos de hoje ({habitos?.length ?? 0})
-          </h2>
-
-            {habitos.length === 0 ? (
-              <p className="text-sm text-slate-400">
-                Nenhum hábito cadastrado ainda. Use a aba &quot;Hábitos&quot;.
-              </p>
+            {tarefasDeHoje.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-10 text-center">
+                <div className="mb-4 rounded-full bg-slate-800 p-4 text-slate-600">
+                  <FaTasks className="text-3xl" />
+                </div>
+                <p className="text-slate-400">Nenhuma tarefa para hoje.</p>
+                <p className="text-xs text-slate-500 mt-1">Foque em seus hábitos ou descanse!</p>
+              </div>
             ) : (
-              <ul className="flex flex-col gap-2 w-full">
-                {habitos.map(habito => {
-                  const concluido = habitoConcluidoNoDia(habito.id, hoje);
+              <div className="grid gap-3">
+                {tarefasDeHoje.map(tarefa => (
+                  <div
+                    key={tarefa.id}
+                    onClick={() => alternarTarefa(tarefa.id)}
+                    className="group flex cursor-pointer items-center justify-between rounded-xl border border-slate-800 bg-[#1B1B22] p-4 transition-all hover:border-red-500/30 hover:bg-[#22222a]"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="relative flex items-center justify-center">
+                        {tarefa.concluida ? (
+                          <FaCheckCircle className="h-6 w-6 text-emerald-500" />
+                        ) : (
+                          <div className="h-6 w-6 rounded-full border-2 border-slate-600 transition-colors group-hover:border-red-500" />
+                        )}
+                      </div>
+                      <span className={`text-lg transition-all ${tarefa.concluida ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                        {tarefa.titulo}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
 
+          {/* Seção de Hábitos */}
+          <section className="flex flex-col gap-4">
+            <h2 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
+              <FiRefreshCcw className="text-red-500 text-xl" />
+              Hábitos diários
+              <span className="ml-2 rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">
+                {habitosDeHoje.length}
+              </span>
+            </h2>
+
+            {habitosDeHoje.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
+                Nenhum hábito configurado.
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {habitosDeHoje.map(habito => {
+                  const concluido = habitoConcluidoNoDia(habito.id, hoje);
                   return (
-                    <li
+                    <div
                       key={habito.id}
-                      className="rounded-lg border border-slate-800 bg-[#1B1B22] px-3 py-3 transition hover:border-red-800 hover:bg-[#202028] active:scale-[0.99]"
+                      onClick={() => alternarHabitoNoDia(habito.id, hoje)}
+                      className={`group flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all ${
+                        concluido 
+                          ? 'border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10' 
+                          : 'border-slate-800 bg-[#1B1B22] hover:border-red-500/30 hover:bg-[#22222a]'
+                      }`}
                     >
-                      <label className="flex w-full cursor-pointer items-center justify-between">
-                        
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={concluido}
-                            onChange={() => alternarHabitoNoDia(habito.id, hoje)}
-                            className="h-6 w-6 appearance-none rounded-full border-2 border-slate-500 checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition"
-                          />
-                  
-                          <span
-                            className={
-                              concluido
-                                ? "text-slate-400 line-through"
-                                : "text-slate-100"
-                            }
-                          >
-                            {habito.titulo}
-                          </span>
+                      <div className="flex items-center justify-between">
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                          concluido ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 group-hover:bg-red-500/20 group-hover:text-red-400'
+                        }`}>
+                          {concluido ? <FaCheckCircle /> : <FiClock />}
                         </div>
-                  
-                        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                           {habito.horario}
                         </span>
-                  
-                      </label>
-                    </li>
-                  )
+                      </div>
+                      <span className={`font-medium transition-all ${concluido ? 'text-slate-400 line-through' : 'text-slate-200'}`}>
+                        {habito.titulo}
+                      </span>
+                    </div>
+                  );
                 })}
-              </ul>
+              </div>
             )}
-          </div>
+          </section>
+        </div>
 
-          <div className="flex flex-col">
-            <span className="mb-4 text-lg font-medium text-slate-200">📊 Resumo</span>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-              
-              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-red-900/30 w-fit">
-                  <FaFire className="text-red-500 text-xl" />
+        {/* Coluna Lateral: Resumo e Estatísticas */}
+        <aside className="flex flex-col gap-6">
+          <div className="rounded-2xl border border-slate-800 bg-[#1B1B22] p-6">
+            <h3 className="mb-6 text-sm font-semibold uppercase tracking-wider text-slate-400">
+              Resumo do Dia
+            </h3>
+            
+            <div className="grid gap-4">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+                  <FaFire className="text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">0</span>
-                <p className="text-xs text-slate-400">Sequência total</p>
+                <div>
+                  <p className="text-2xl font-bold text-white">0</p>
+                  <p className="text-xs text-slate-400">Dias de sequência</p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-green-900/30 w-fit">
-                  <BiTask className="text-green-500 text-xl" />
+              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/10 text-green-500">
+                  <FaTasks className="text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">0/{tarefas.length}</span>
-                <p className="text-xs text-slate-400">Tarefas</p>
+                <div>
+                  <p className="text-2xl font-bold text-white">{tarefasConcluidas}/{tarefasDeHoje.length}</p>
+                  <p className="text-xs text-slate-400">Tarefas concluídas</p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-yellow-900/30 w-fit">
-                  <FiRefreshCcw className="text-yellow-500 text-xl" />
+              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+                  <FiRefreshCcw className="text-xl" />
                 </div>
-                <span className="text-2xl font-semibold text-white">4/{habitos.length}</span>
-                <p className="text-xs text-slate-400">Hábitos</p>
+                <div>
+                  <p className="text-2xl font-bold text-white">{habitosConcluidos}/{habitosDeHoje.length}</p>
+                  <p className="text-xs text-slate-400">Hábitos realizados</p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#1B1B22] border border-slate-800 hover:border-red-700 transition">
-                <div className="p-3 rounded-lg bg-orange-900/30 w-fit">
-                  <FiTarget className="text-orange-500 text-xl" />
+              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
+                  <FiTarget className="text-xl" />
                 </div>
-                <span className="flex items-center text-2xl font-semibold text-white">35 <MdOutlineKeyboardDoubleArrowUp color='#00C950'/></span> 
-                <p className="text-xs text-slate-400">Pontos da semana</p>
+                <div>
+                  <p className="flex items-center gap-2 text-2xl font-bold text-white">
+                    35 
+                    <MdOutlineKeyboardDoubleArrowUp className="text-emerald-500 text-lg" />
+                  </p>
+                  <p className="text-xs text-slate-400">Pontos da semana</p>
+                </div>
               </div>
+            </div>
 
+            <div className="mt-8 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 p-6 text-white shadow-lg shadow-red-500/10">
+              <h4 className="font-bold">Dica do dia</h4>
+              <p className="mt-2 text-sm text-red-50/90 leading-relaxed">
+                Manter uma rotina consistente é a chave para o sucesso a longo prazo. Comece pequeno, cresça sempre.
+              </p>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
-    </section>
+    </div>
   );
 }
 
