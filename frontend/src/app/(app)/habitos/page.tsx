@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
-import { useTaskmind } from '../providers';
+import { useTaskmind } from '@/app/providers';
 import { FaRegTrashAlt } from 'react-icons/fa';
 
 function toISODate(d: Date) {

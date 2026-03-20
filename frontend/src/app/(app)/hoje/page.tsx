@@ -1,11 +1,11 @@
 'use client';
 
 import { FaFire, FaTasks } from 'react-icons/fa';
-import { useTaskmind } from '../providers';
 import { FiRefreshCcw, FiTarget } from 'react-icons/fi';
 import { BiTask } from 'react-icons/bi';
 import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
 import { useEffect, useState } from 'react';
+import { useTaskmind } from '@/app/providers';
 
 export default function HojePage() {
   const {

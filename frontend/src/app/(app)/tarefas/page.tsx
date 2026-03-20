@@ -1,7 +1,7 @@
 'use client';
 
+import { useTaskmind } from '@/app/providers';
 import { FormEvent, useState } from 'react';
-import { useTaskmind } from '../providers';
 
 export default function TarefasPage() {
   const { hoje, tarefas, adicionarTarefa, alternarTarefa, removerTarefa } =
