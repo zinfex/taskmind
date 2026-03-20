@@ -21,8 +21,8 @@ export function Header() {
     <header className="border-b border-slate-800 backdrop-blur sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-tr from-red-400 to-red-500 text-md font-bold text-slate-950">
-            TM
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-tr from-red-500 to-red-600 text-md font-bold text-slate-950">
+            <img src={'logo.png'} width={20}/>
           </div>
           <div>
             <p className="text-md font-semibold text-slate-50">TaskMind</p>
