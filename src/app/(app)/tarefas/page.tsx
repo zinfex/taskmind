@@ -4,7 +4,7 @@ import { useTaskmind } from '@/app/providers';
 import { useActionState, useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaCheck } from 'react-icons/fa';
-import { createTarefas, listTarefas, toggleTarefa, deleteTarefasDB } from '@/app/actions/tarefas';
+import { createTarefas, listTarefas, toggleTarefa, deleteTarefasDB, type ActionState } from '@/app/actions/tarefas';
 import Loading from '@/app/components/(app)/Loading';
 
 export default function TarefasPage() {
@@ -15,9 +15,10 @@ export default function TarefasPage() {
   
   const formRef = useRef<HTMLFormElement>(null);
 
-  const initialState = {
-    error: null as string | null,
-    success: null as string | null,
+  // O initialState DEVE ter o mesmo tipo que o retorno da Action
+  const initialState: ActionState = {
+    error: null,
+    success: null,
   };
 
   const [state, formAction, isPending] = useActionState(createTarefas, initialState);
@@ -48,23 +49,24 @@ export default function TarefasPage() {
     }
   }, [state?.success, carregarTarefas]);
 
-  const handleToggle = async (id: string, finalizadaAtual: string | boolean) => {
-    // Atualização otimista na UI
+  const handleToggle = async (id: number | string, statusAtual: any) => {
+    const isFinalizada = statusAtual === true || statusAtual === "TRUE";
+    const novoStatus = !isFinalizada;
+
     setTarefasDB(prev => prev.map(t => 
-      t.id === id ? { ...t, finalizada: (finalizadaAtual === "TRUE" || finalizadaAtual === true) ? "FALSE" : "TRUE" } : t
+      t.id === id ? { ...t, finalizada: novoStatus } : t
     ));
 
-    const res = await toggleTarefa(id, finalizadaAtual);
+    const res = await toggleTarefa(id, novoStatus);
     if (res.error) {
       alert("Erro ao atualizar tarefa: " + res.error);
-      carregarTarefas(); // Reverte se der erro
+      carregarTarefas();
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number | string) => {
     if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
 
-    // Atualização otimista
     setTarefasDB(prev => prev.filter(t => t.id !== id));
 
     const res = await deleteTarefasDB(id);
@@ -73,8 +75,6 @@ export default function TarefasPage() {
       carregarTarefas();
     }
   };
-
-  const tarefasDeHoje = tarefasDB;
 
   if (!mounted) return null;
 
@@ -135,13 +135,13 @@ export default function TarefasPage() {
             Lista de tarefas
           </h2>
           <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
-            {tarefasDeHoje.length} total
+            {tarefasDB.length} total
           </span>
         </div>
 
         {carregando ? (
           <Loading />
-        ) : tarefasDeHoje.length === 0 ? (
+        ) : tarefasDB.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-800 py-16 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-slate-700">
               <FaCheck className="h-6 w-6" />
@@ -153,8 +153,8 @@ export default function TarefasPage() {
         ) : (
           <ul className="grid gap-3">
             <AnimatePresence mode="popLayout">
-              {tarefasDeHoje.map(tarefa => {
-                const isFinalizada = tarefa.finalizada === "TRUE" || tarefa.finalizada === true;
+              {tarefasDB.map(tarefa => {
+                const isFinalizada = tarefa.finalizada === true || tarefa.finalizada === "TRUE";
                 return (
                   <motion.li
                     layout

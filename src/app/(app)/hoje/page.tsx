@@ -41,13 +41,17 @@ export default function HojePage() {
     carregarTarefas();
   }, [carregarTarefas]);
 
-  const handleToggle = async (id: string, finalizadaAtual: string | boolean) => {
+  const handleToggle = async (id: number | string, statusAtual: any) => {
+    // Normaliza para booleano
+    const isFinalizada = statusAtual === true || statusAtual === "TRUE";
+    const novoStatus = !isFinalizada;
+
     // Atualização otimista
     setTarefasDB(prev => prev.map(t => 
-      t.id === id ? { ...t, finalizada: (finalizadaAtual === "TRUE" || finalizadaAtual === true) ? "FALSE" : "TRUE" } : t
+      t.id === id ? { ...t, finalizada: novoStatus } : t
     ));
 
-    const res = await toggleTarefa(id, finalizadaAtual);
+    const res = await toggleTarefa(id, novoStatus);
     if (res.error) {
       alert("Erro ao atualizar tarefa: " + res.error);
       carregarTarefas();
@@ -57,7 +61,7 @@ export default function HojePage() {
   const tarefasDeHoje = tarefasDB;
   const habitosDeHoje = habitos || [];
 
-  const tarefasConcluidas = tarefasDeHoje.filter(t => t.finalizada === "TRUE" || t.finalizada === true).length;
+  const tarefasConcluidas = tarefasDeHoje.filter(t => t.finalizada === true || t.finalizada === "TRUE").length;
   const habitosConcluidos = habitosDeHoje.filter(h => habitoConcluidoNoDia(h.id, hoje)).length;
   
   const totalItens = tarefasDeHoje.length + habitosDeHoje.length;
@@ -129,7 +133,7 @@ export default function HojePage() {
             ) : (
               <div className="grid gap-3">
                 {tarefasDeHoje.map(tarefa => {
-                  const isFinalizada = tarefa.finalizada === "TRUE" || tarefa.finalizada === true;
+                  const isFinalizada = tarefa.finalizada === true || tarefa.finalizada === "TRUE";
                   return (
                     <div
                       key={tarefa.id}

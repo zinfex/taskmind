@@ -3,12 +3,16 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiLogIn, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
-import { signup } from '@/app/actions/auth';
+import { signup, type AuthActionState } from '@/app/actions/auth';
 import { useActionState } from 'react';
 
+const initialState: AuthActionState = {
+  error: null,
+  success: null,
+}
 
 export default function SignupPage() {
-  const [state, action, isPending] = useActionState(signup);
+  const [state, action, isPending] = useActionState(signup, initialState);
 
   return (
     <div className="relative w-full max-w-md px-4 justify-center mt-20 justify-self-center">
@@ -24,13 +28,13 @@ export default function SignupPage() {
         {/* Header */}
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-xl font-bold text-slate-950">
-            <img src={'logo.png'} width={20}/>
+            <img src={'logo.png'} width={20} alt="Logo" />
           </div>
           <h1 className="text-2xl font-bold text-slate-50 mt-4">Criar sua conta</h1>
-          <p className="text-slate-400">Junte-se ao TaskMind hoje mesmo</p>
+          <p className="text-slate-400">Comece a organizar sua mente hoje</p>
         </div>
 
-        {/* Feedback Messages */}
+        {/* Status Messages */}
         {state?.error && (
           <div className="flex items-center gap-2 rounded-xl bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20 animate-in fade-in slide-in-from-top-1">
             <FiAlertCircle className="shrink-0" />
@@ -39,67 +43,58 @@ export default function SignupPage() {
         )}
 
         {state?.success && (
-          <div className="flex flex-col gap-3 rounded-xl bg-emerald-500/10 p-4 text-sm text-emerald-400 border border-emerald-500/20 animate-in fade-in slide-in-from-top-1">
-            <div className="flex items-center flex-col gap-2">
-              <FiCheckCircle className="shrink-0" />
-              <p className="font-semibold">{state.success}</p>
-            </div>
-            <Link 
-              href="/login" 
-              className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2 text-slate-950 font-bold hover:bg-emerald-400 transition-colors"
-            >
-              Confirme seu e-mail
-            </Link>
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 p-4 text-sm text-emerald-400 border border-emerald-500/20 animate-in fade-in slide-in-from-top-1">
+            <FiCheckCircle className="shrink-0" />
+            <p>{state.success}</p>
           </div>
         )}
 
         {/* Form */}
-        {!state?.success && (
-          <form className="flex flex-col gap-4" action={action}>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-slate-300 ml-1">E-mail</label>
-              <div className="relative group">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-red-500" />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="exemplo@email.com"
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-3.5 pl-11 pr-4 text-slate-50 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/10 disabled:opacity-50"
-                  disabled={isPending}
-                />
-              </div>
+        <form className="flex flex-col gap-4" action={action}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-300 ml-1">E-mail</label>
+            <div className="relative group">
+              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-red-500" />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="exemplo@email.com"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-3.5 pl-11 pr-4 text-slate-50 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/10 disabled:opacity-50"
+                disabled={isPending}
+              />
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-slate-300 ml-1">Senha</label>
-              <div className="relative group">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-red-500" />
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  placeholder="••••••••"
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-3.5 pl-11 pr-4 text-slate-50 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/10 disabled:opacity-50"
-                  disabled={isPending}
-                />
-              </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-300 ml-1">Senha</label>
+            <div className="relative group">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-red-500" />
+              <input
+                type="password"
+                name="password"
+                required
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/50 py-3.5 pl-11 pr-4 text-slate-50 outline-none transition-all placeholder:text-slate-600 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/10 disabled:opacity-50"
+                disabled={isPending}
+              />
             </div>
+            <p className="text-[10px] text-slate-500 ml-1">A senha deve ter pelo menos 6 caracteres</p>
+          </div>
 
-            <button
-              type='submit'
-              disabled={isPending}
-              className="group mt-2 flex items-center justify-center gap-2 rounded-xl bg-red-500 py-3.5 font-bold text-slate-50 transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isPending ? 'Criando conta...' : (
-                <>
-                  Criar Conta
-                  <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-                </>
-              )}
-            </button>
-          </form>
-        )}
+          <button
+            type='submit'
+            disabled={isPending}
+            className="group mt-2 flex items-center justify-center gap-2 rounded-xl bg-red-500 py-3.5 font-bold text-slate-50 transition-all hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? 'Criando conta...' : (
+              <>
+                Cadastrar
+                <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+          </button>
+        </form>
 
         {/* Divider */}
         <div className="relative flex items-center gap-4">
@@ -108,7 +103,7 @@ export default function SignupPage() {
           <div className="h-px flex-1 bg-slate-800"></div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Back to Login */}
         <div className="flex flex-col gap-3">
           <Link
             href="/login"

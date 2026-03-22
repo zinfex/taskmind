@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 
 export async function tarefas(userId: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   return await supabase
     .from('tarefas')

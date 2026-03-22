@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiUserPlus, FiUserCheck, FiAlertCircle } from 'react-icons/fi';
-import { login } from '@/app/actions/auth';
+import { login, type AuthActionState } from '@/app/actions/auth';
 import { useActionState } from 'react';
 
-const initialState = {
-  error: null as string | null,
+const initialState: AuthActionState = {
+  error: null,
+  success: null,
 }
 
 export default function LoginPage() {
@@ -27,7 +28,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-xl font-bold text-slate-950">
-            <img src={'logo.png'} width={20}/>
+            <img src={'logo.png'} width={20} alt="Logo" />
           </div>
           <h1 className="text-2xl font-bold text-slate-50 mt-4">Bem-vindo de volta</h1>
           <p className="text-slate-400">Entre na sua conta para continuar</p>
