@@ -68,17 +68,17 @@ export default function HabitosPage() {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-slate-900/50 p-1 ring-1 ring-slate-800"
+        className="rounded-2xl"
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 rounded-xl p-4 lg:flex-row lg:items-end"
+          className="flex flex-col gap-4 rounded-xl  lg:flex-row lg:items-end"
         >
           <div className="flex flex-1 flex-col gap-2">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1">
               Nome do Hábito
             </label>
-            <div className="flex items-center gap-3 rounded-lg bg-slate-900 px-3 ring-1 ring-slate-800 focus-within:ring-red-500/50">
+            <div className="flex items-center gap-3 rounded-lg bg-slate-800 px-3 ring-1 ring-slate-800 focus-within:ring-red-500/50">
               <FaPlus className="h-4 w-4 text-slate-500" />
               <input
                 type="text"
@@ -94,7 +94,7 @@ export default function HabitosPage() {
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1">
               Horário
             </label>
-            <div className="flex items-center gap-3 rounded-lg bg-slate-900 px-3 ring-1 ring-slate-800 focus-within:ring-red-500/50">
+            <div className="flex items-center gap-3 rounded-lg bg-slate-800 px-3 ring-1 ring-slate-800 focus-within:ring-red-500/50">
               <FaClock className="h-4 w-4 text-slate-500" />
               <input
                 type="time"
@@ -116,7 +116,7 @@ export default function HabitosPage() {
         </form>
       </motion.div>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-900/20 p-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-800/20 p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -132,7 +132,7 @@ export default function HabitosPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg bg-slate-900 p-1 ring-1 ring-slate-800">
+          <div className="flex items-center gap-2 rounded-lg bg-slate-800 p-1 ring-1 ring-slate-800">
             <button
               type="button"
               onClick={() => {
@@ -175,8 +175,8 @@ export default function HabitosPage() {
           <div className="overflow-x-auto rounded-xl ring-1 ring-slate-800">
             <table className="w-full min-w-[700px] border-collapse">
               <thead>
-                <tr className="bg-slate-900/50">
-                  <th className="sticky left-0 z-10 w-[240px] border-b border-slate-800 bg-slate-900 px-4 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                <tr className="bg-slate-800/50">
+                  <th className="sticky left-0 z-10 w-[190px] border-b border-slate-800 bg-slate-800 px-4 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                     Hábito
                   </th>
                   {diasDaSemana.map(dia => {
@@ -206,8 +206,8 @@ export default function HabitosPage() {
               </thead>
               <tbody className="divide-y divide-slate-800 bg-slate-950/20">
                 {habitos.map(habito => (
-                  <tr key={habito.id} className="group hover:bg-slate-900/30">
-                    <td className="sticky left-0 z-10 bg-slate-950 px-4 py-4 backdrop-blur-sm group-hover:bg-slate-900/50">
+                  <tr key={habito.id} className="group hover:bg-slate-800/30">
+                    <td className="sticky left-0 z-10 bg-slate-850/50 px-4 py-4 group-hover:bg-slate-800/50">
                       <div className="flex flex-col">
                         <span className="font-semibold text-slate-200">
                           {habito.titulo}
@@ -236,7 +236,7 @@ export default function HabitosPage() {
                               onChange={() =>
                                 alternarHabitoNoDia(habito.id, dia.iso)
                               }
-                              className="h-6 w-6 appearance-none rounded-full border-2 border-slate-700 bg-slate-950 transition-all checked:border-emerald-500 checked:bg-emerald-500 cursor-pointer hover:border-slate-500"
+                              className="h-6 w-6 appearance-none rounded-full border-2 border-slate-700 bg-slate-950/30 transition-all checked:border-emerald-500 checked:bg-emerald-500 cursor-pointer hover:border-slate-500"
                             />
                           </label>
                         </td>

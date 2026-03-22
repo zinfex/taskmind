@@ -6,6 +6,8 @@ import { BiTask } from 'react-icons/bi';
 import { MdOutlineKeyboardDoubleArrowUp } from 'react-icons/md';
 import { useEffect, useState, useMemo } from 'react';
 import { useTaskmind } from '@/app/providers';
+import { GiSun } from 'react-icons/gi';
+import { IoPartlySunny } from 'react-icons/io5';
 
 export default function HojePage() {
   const {
@@ -49,13 +51,17 @@ export default function HojePage() {
       {/* Header com Boas-vindas e Progresso */}
       <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Bom dia! <span className="text-red-500">✨</span>
+          <h1 className="font-bold tracking-tight text-white flex gap-2 items-center">
+             <span className="text-slate-100 text-5xl"><IoPartlySunny /> </span>
+
+              <div>
+                <span className='text-3xl'>Bom dia!</span>
+                <p className="flex items-center gap-2 text-1xl text-slate-400">
+                  <span className="capitalize">{dataFormatada}</span>
+                </p>
+              </div>
           </h1>
-          <p className="flex items-center gap-2 text-slate-400">
-            <FiCalendar className="text-red-400" />
-            <span className="capitalize">{dataFormatada}</span>
-          </p>
+          
         </div>
 
         <div className="flex flex-col gap-2 min-w-[240px]">
@@ -89,7 +95,7 @@ export default function HojePage() {
             </div>
 
             {tarefasDeHoje.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-10 text-center">
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-800 bg-slate-800/20 p-10 text-center ">
                 <div className="mb-4 rounded-full bg-slate-800 p-4 text-slate-600">
                   <FaTasks className="text-3xl" />
                 </div>
@@ -133,7 +139,7 @@ export default function HojePage() {
             </h2>
 
             {habitosDeHoje.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
+              <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-800/20 p-6 text-center text-sm text-slate-400">
                 Nenhum hábito configurado.
               </div>
             ) : (
@@ -173,14 +179,14 @@ export default function HojePage() {
 
         {/* Coluna Lateral: Resumo e Estatísticas */}
         <aside className="flex flex-col gap-6">
-          <div className="rounded-2xl border border-slate-800 bg-[#1B1B22] p-6">
+          <div className="rounded-2xl border border-slate-800  p-6">
             <h3 className="mb-6 text-sm font-semibold uppercase tracking-wider text-slate-400">
               Resumo do Dia
             </h3>
             
             <div className="grid gap-4">
-              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-800/20 p-4 border border-slate-700/50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-500 ">
                   <FaFire className="text-xl" />
                 </div>
                 <div>
@@ -189,7 +195,7 @@ export default function HojePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-800/20 p-4 border border-slate-700/50">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/10 text-green-500">
                   <FaTasks className="text-xl" />
                 </div>
@@ -199,7 +205,7 @@ export default function HojePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-800/20 p-4 border border-slate-700/50">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
                   <FiRefreshCcw className="text-xl" />
                 </div>
@@ -209,7 +215,7 @@ export default function HojePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 rounded-xl bg-slate-900/50 p-4 border border-slate-800/50">
+              <div className="flex items-center gap-4 rounded-xl bg-slate-800/20 p-4 border border-slate-700/50">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
                   <FiTarget className="text-xl" />
                 </div>
@@ -223,7 +229,7 @@ export default function HojePage() {
               </div>
             </div>
 
-            <div className="mt-8 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 p-6 text-white shadow-lg shadow-red-500/10">
+            <div className="mt-8 rounded-xl bg-gradient-to-br from-blue-900 to-red-700 p-6 text-white shadow-lg shadow-red-500/10">
               <h4 className="font-bold">Dica do dia</h4>
               <p className="mt-2 text-sm text-red-50/90 leading-relaxed">
                 Manter uma rotina consistente é a chave para o sucesso a longo prazo. Comece pequeno, cresça sempre.

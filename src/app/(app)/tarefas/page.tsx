@@ -33,14 +33,14 @@ export default function TarefasPage() {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-slate-900/50 p-1 ring-1 ring-slate-800"
+        className="rounded-2xl bg-slate-800/50 p-1 ring-1 ring-slate-800"
       >
         <form
           onSubmit={handleSubmit}
           className="relative flex flex-col gap-2 rounded-xl p-4 sm:flex-row sm:items-center"
         >
           <div className="flex flex-1 items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lgbg-re d-500/10 text-red-500">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
               <FaPlus className="h-4 w-4" />
             </div>
             <input
