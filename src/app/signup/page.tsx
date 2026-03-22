@@ -6,13 +6,9 @@ import { FiMail, FiLock, FiArrowRight, FiLogIn, FiAlertCircle, FiCheckCircle } f
 import { signup } from '@/app/actions/auth';
 import { useActionState } from 'react';
 
-const initialState = {
-  error: null as string | null,
-  success: null as string | null,
-}
 
 export default function SignupPage() {
-  const [state, action, isPending] = useActionState(signup, initialState);
+  const [state, action, isPending] = useActionState(signup);
 
   return (
     <div className="relative w-full max-w-md px-4 justify-center mt-20 justify-self-center">
@@ -27,8 +23,8 @@ export default function SignupPage() {
       >
         {/* Header */}
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-red-400 to-red-600 text-xl font-bold text-slate-950">
-            TM
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-xl font-bold text-slate-950">
+            <img src={'logo.png'} width={20}/>
           </div>
           <h1 className="text-2xl font-bold text-slate-50 mt-4">Criar sua conta</h1>
           <p className="text-slate-400">Junte-se ao TaskMind hoje mesmo</p>
@@ -44,7 +40,7 @@ export default function SignupPage() {
 
         {state?.success && (
           <div className="flex flex-col gap-3 rounded-xl bg-emerald-500/10 p-4 text-sm text-emerald-400 border border-emerald-500/20 animate-in fade-in slide-in-from-top-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center flex-col gap-2">
               <FiCheckCircle className="shrink-0" />
               <p className="font-semibold">{state.success}</p>
             </div>
@@ -52,7 +48,7 @@ export default function SignupPage() {
               href="/login" 
               className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2 text-slate-950 font-bold hover:bg-emerald-400 transition-colors"
             >
-              Ir para o Login
+              Confirme seu e-mail
             </Link>
           </div>
         )}
