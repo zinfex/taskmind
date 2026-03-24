@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TaskMind",
+  title: "TaskMind | Se organize hoje!",
   description: "Organize tarefas, hábitos e seu dia em um só lugar.",
 };
 

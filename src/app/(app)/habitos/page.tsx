@@ -1,9 +1,11 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useActionState, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTaskmind } from '@/app/providers';
 import { motion } from 'framer-motion';
 import { FaRegTrashAlt, FaPlus, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaClock } from 'react-icons/fa';
+import { ActionState, createHabitos, deleteHabitosDB, listHabitos, toggleHabito } from '@/app/actions/habitos';
+import LoadingSkeleton from '@/app/components/(app)/LoadingSkeleton';
 
 function toISODate(d: Date) {
   const ano = d.getFullYear();
@@ -36,6 +38,75 @@ export default function HabitosPage() {
     startOfWeekMonday(new Date()),
   );
 
+  const [habitosDB, setHabitosDB] = useState<any[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // O initialState DEVE ter o mesmo tipo que o retorno da Action
+  const initialState: ActionState = {
+    error: null,
+    success: null,
+  };
+
+  const [state, formAction, isPending] = useActionState(createHabitos, initialState);
+  
+  const carregarHabitos = useCallback(async () => {
+    setCarregando(true);
+    try {
+      const resultado = await listHabitos();
+      if (resultado.success && resultado.data) {
+        setHabitosDB(resultado.data);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar hábitos:", err);
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+    carregarHabitos();
+  }, [carregarHabitos]);
+
+  useEffect(() => {
+    if (state?.success) {
+      formRef.current?.reset();
+      setTitulo('');
+      setHorario('07:00');
+      carregarHabitos();
+    }
+  }, [state, carregarHabitos]);
+
+  const handleToggle = async (habitoId: any, dataIso: string) => {
+    const concluido = habitoConcluidoNoDia(habitoId, dataIso);
+    
+    // Atualiza local (TaskmindProvider)
+    alternarHabitoNoDia(habitoId, dataIso);
+
+    // Sincroniza com banco
+    const res = await toggleHabito(habitoId, !concluido, dataIso);
+    if (res.error) {
+      console.error("Erro ao sincronizar toggle no banco:", res.error);
+      alert("Erro ao salvar no banco: " + res.error);
+      carregarHabitos();
+    }
+  };
+
+  const handleDelete = async (id: number | string) => {
+    if (!confirm("Tem certeza que deseja excluir este hábito?")) return;
+
+    setHabitosDB(prev => prev.filter(t => t.id !== id));
+
+    const res = await deleteHabitosDB(id);
+    if (res.error) {
+      alert("Erro ao excluir hábito: " + res.error);
+      carregarHabitos();
+    }
+  };
+
   const diasDaSemana = useMemo(() => {
     const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
     return Array.from({ length: 7 }).map((_, idx) => {
@@ -56,6 +127,9 @@ export default function HabitosPage() {
     setTitulo('');
   }
 
+  if (!mounted) return null;
+
+
   return (
     <section className="flex w-full flex-col gap-8">
       <header className="flex flex-col gap-2">
@@ -71,7 +145,9 @@ export default function HabitosPage() {
         className="rounded-2xl"
       >
         <form
-          onSubmit={handleSubmit}
+          // onSubmit={handleSubmit}
+          ref={formRef}
+          action={formAction}
           className="flex flex-col gap-4 rounded-xl  lg:flex-row lg:items-end"
         >
           <div className="flex flex-1 flex-col gap-2">
@@ -83,6 +159,7 @@ export default function HabitosPage() {
               <input
                 type="text"
                 value={titulo}
+                name='titulo'
                 onChange={e => setTitulo(e.target.value)}
                 placeholder="Ex: Ler 10 páginas, beber água..."
                 className="flex-1 bg-transparent py-2.5 text-slate-100 outline-none placeholder:text-slate-600"
@@ -98,6 +175,7 @@ export default function HabitosPage() {
               <FaClock className="h-4 w-4 text-slate-500" />
               <input
                 type="time"
+                name='finalizar'
                 value={horario}
                 onChange={e => setHorario(e.target.value)}
                 className="flex-1 bg-transparent py-2.5 text-slate-100 outline-none [color-scheme:dark]"
@@ -107,13 +185,16 @@ export default function HabitosPage() {
 
           <button
             type="submit"
-            disabled={!titulo.trim()}
+            disabled={!titulo.trim() || isPending}
             className="flex h-[46px] items-center justify-center gap-2 rounded-lg bg-red-600 px-6 font-semibold text-white shadow-lg shadow-red-900/20 transition-all hover:bg-red-500 active:scale-95 disabled:opacity-50"
           >
             <FaPlus className="h-3 w-3" />
-            <span>Criar Hábito</span>
+            <span>{isPending ? 'Criando...' : 'Criar Hábito'}</span>
           </button>
         </form>
+        {state?.error && (
+          <p className="mt-2 text-sm text-red-500 ml-1">{state.error}</p>
+        )}
       </motion.div>
 
       <div className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-800/20 p-6">
@@ -165,7 +246,9 @@ export default function HabitosPage() {
           </div>
         </div>
 
-        {habitos.length === 0 ? (
+        {carregando ? (
+          <LoadingSkeleton />
+        ) : habitosDB.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-800 py-12 text-center">
             <p className="text-slate-500 italic">
               Nenhum hábito cadastrado para esta visualização.
@@ -176,7 +259,7 @@ export default function HabitosPage() {
             <table className="w-full min-w-[700px] border-collapse">
               <thead>
                 <tr className="bg-slate-800/50">
-                  <th className="sticky left-0 z-10 w-[190px] border-b border-slate-800 bg-slate-800 px-4 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <th className="sticky left-0 z-10 w-[220px] border-b border-slate-800 bg-slate-800 px-4 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                     Hábito
                   </th>
                   {diasDaSemana.map(dia => {
@@ -205,16 +288,16 @@ export default function HabitosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 bg-slate-950/20">
-                {habitos.map(habito => (
+                {habitosDB.map(habito => (
                   <tr key={habito.id} className="group hover:bg-slate-800/30">
-                    <td className="sticky left-0 z-10 bg-slate-850/50 px-4 py-4 group-hover:bg-slate-800/50">
+                    <td className="sticky left-0 z-10 bg-[#111117] px-4 py-4 group-hover:bg-slate-800/50">
                       <div className="flex flex-col">
                         <span className="font-semibold text-slate-200">
                           {habito.titulo}
                         </span>
                         <span className="flex items-center gap-1 text-[11px] text-slate-500">
                           <FaClock className="h-2.5 w-2.5" />
-                          {habito.horario}
+                          {habito.finalizar || 'Sem horário'}
                         </span>
                       </div>
                     </td>
@@ -229,16 +312,32 @@ export default function HabitosPage() {
                             isHoje ? 'bg-emerald-500/5' : ''
                           }`}
                         >
-                          <label className="flex cursor-pointer items-center justify-center">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() =>
-                                alternarHabitoNoDia(habito.id, dia.iso)
-                              }
-                              className="h-6 w-6 appearance-none rounded-full border-2 border-slate-700 bg-slate-950/30 transition-all checked:border-emerald-500 checked:bg-emerald-500 cursor-pointer hover:border-slate-500"
-                            />
-                          </label>
+                          <div className="flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleToggle(habito.id, dia.iso)}
+                              className={`flex h-7 w-7 items-center justify-center rounded-lg border-2 transition-all duration-200 ${
+                                checked
+                                  ? 'border-emerald-500 bg-emerald-500 text-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                                  : 'border-slate-700 bg-slate-900/50 text-transparent hover:border-slate-500'
+                              }`}
+                            >
+                              <svg
+                                className={`h-4 w-4 stroke-[3px] transition-transform duration-200 ${
+                                  checked ? 'scale-100' : 'scale-0'
+                                }`}
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </td>
                       );
                     })}
@@ -246,7 +345,7 @@ export default function HabitosPage() {
                     <td className="px-4 py-4 text-center">
                       <button
                         type="button"
-                        onClick={() => removerHabito(habito.id)}
+                        onClick={() => handleDelete(habito.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-500"
                         aria-label={`Excluir hábito: ${habito.titulo}`}
                       >

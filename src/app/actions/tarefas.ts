@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 export type ActionState = {
   error: string | null;
   success: boolean | null;
+  timestamp?: number;
 };
 
 export async function createTarefas(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -54,7 +55,7 @@ export async function createTarefas(prevState: ActionState, formData: FormData):
 
     revalidatePath("/tarefas");
     revalidatePath("/hoje");
-    return { error: null, success: true };
+    return { error: null, success: true, timestamp: Date.now() };
   } catch (err: any) {
     return { error: "Erro interno no servidor.", success: null };
   }

@@ -47,7 +47,7 @@ export default function TarefasPage() {
       formRef.current?.reset();
       carregarTarefas();
     }
-  }, [state?.success, carregarTarefas]);
+  }, [state, carregarTarefas]);
 
   const handleToggle = async (id: number | string, statusAtual: any) => {
     const isFinalizada = statusAtual === true || statusAtual === "TRUE";
@@ -162,7 +162,8 @@ export default function TarefasPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="group flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/30 p-4 transition-colors hover:border-slate-700 hover:bg-slate-900/50"
+                    onClick={() => handleToggle(tarefa.id, tarefa.finalizada)}
+                    className="group flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/30 p-4 transition-colors hover:border-slate-700 hover:bg-slate-900/50 cursor-pointer"
                   >
                     <div className="flex flex-1 items-center gap-4">
                       <div 

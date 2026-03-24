@@ -1,5 +1,7 @@
 ## TaskMind
 
+![imagem](/public/readme.png)
+
 O **TaskMind** é um projeto **open source** focado em organização pessoal, unindo tarefas, hábitos e visão do dia em um só lugar, com uma interface simples e agradável.
 
 - **Hoje**: visão diária com tudo o que precisa ser feito (tarefas + hábitos do dia).
@@ -7,9 +9,12 @@ O **TaskMind** é um projeto **open source** focado em organização pessoal, un
 - **Hábitos**: hábitos diários com horário definido e acompanhamento por calendário semanal.
 - **Outras áreas**: abas para bem-estar, academia, estudo, financeiro e configurações.
 
+![imagem](/public/tabela.png)
+
 Desenvolvido com **Next.js (App Router)**, **React**, **TypeScript** e **Tailwind CSS**, com animações suaves de transição entre páginas.
 
 ---
+
 
 ### Como rodar o projeto
 

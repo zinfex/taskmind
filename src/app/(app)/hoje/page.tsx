@@ -8,29 +8,37 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTaskmind } from '@/app/providers';
 import { IoPartlySunny } from 'react-icons/io5';
 import { listTarefas, toggleTarefa } from '@/app/actions/tarefas';
+import { listHabitos, toggleHabito } from '@/app/actions/habitos';
 import LoadingSkeleton from '@/app/components/(app)/LoadingSkeleton';
 
 export default function HojePage() {
   const {
     hoje,
-    habitos,
     alternarHabitoNoDia,
     habitoConcluidoNoDia,
   } = useTaskmind();
 
   const [mounted, setMounted] = useState(false);
   const [tarefasDB, setTarefasDB] = useState<any[]>([]);
+  const [habitosDB, setHabitosDB] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
 
-  const carregarTarefas = useCallback(async () => {
+  const carregarDados = useCallback(async () => {
     setCarregando(true);
     try {
-      const resultado = await listTarefas();
-      if (resultado.success && resultado.data) {
-        setTarefasDB(resultado.data);
+      const [resTarefas, resHabitos] = await Promise.all([
+        listTarefas(),
+        listHabitos()
+      ]);
+      
+      if (resTarefas.success && resTarefas.data) {
+        setTarefasDB(resTarefas.data);
+      }
+      if (resHabitos.success && resHabitos.data) {
+        setHabitosDB(resHabitos.data);
       }
     } catch (err) {
-      console.error("Erro ao carregar tarefas:", err);
+      console.error("Erro ao carregar dados:", err);
     } finally {
       setCarregando(false);
     }
@@ -38,15 +46,13 @@ export default function HojePage() {
 
   useEffect(() => {
     setMounted(true);
-    carregarTarefas();
-  }, [carregarTarefas]);
+    carregarDados();
+  }, [carregarDados]);
 
-  const handleToggle = async (id: number | string, statusAtual: any) => {
-    // Normaliza para booleano
+  const handleToggleTarefa = async (id: number | string, statusAtual: any) => {
     const isFinalizada = statusAtual === true || statusAtual === "TRUE";
     const novoStatus = !isFinalizada;
 
-    // Atualização otimista
     setTarefasDB(prev => prev.map(t => 
       t.id === id ? { ...t, finalizada: novoStatus } : t
     ));
@@ -54,12 +60,26 @@ export default function HojePage() {
     const res = await toggleTarefa(id, novoStatus);
     if (res.error) {
       alert("Erro ao atualizar tarefa: " + res.error);
-      carregarTarefas();
+      carregarDados();
+    }
+  };
+
+  const handleToggleHabito = async (habito: any) => {
+    const concluido = habitoConcluidoNoDia(habito.id, hoje);
+    
+    // Alterna localmente no provider (controle por dia)
+    alternarHabitoNoDia(habito.id, hoje);
+
+    // Sincroniza com o banco (status global do hábito)
+    const res = await toggleHabito(habito.id, !concluido);
+    if (res.error) {
+      console.error("Erro ao sincronizar hábito no banco:", res.error);
+      // Opcional: reverter localmente se falhar
     }
   };
 
   const tarefasDeHoje = tarefasDB;
-  const habitosDeHoje = habitos || [];
+  const habitosDeHoje = habitosDB;
 
   const tarefasConcluidas = tarefasDeHoje.filter(t => t.finalizada === true || t.finalizada === "TRUE").length;
   const habitosConcluidos = habitosDeHoje.filter(h => habitoConcluidoNoDia(h.id, hoje)).length;
@@ -137,7 +157,7 @@ export default function HojePage() {
                   return (
                     <div
                       key={tarefa.id}
-                      onClick={() => handleToggle(tarefa.id, tarefa.finalizada)}
+                      onClick={() => handleToggleTarefa(tarefa.id, tarefa.finalizada)}
                       className="group flex cursor-pointer items-center justify-between rounded-xl border border-slate-800 bg-[#1B1B22] p-4 transition-all hover:border-red-500/30 hover:bg-[#22222a]"
                     >
                       <div className="flex items-center gap-4">
@@ -179,7 +199,7 @@ export default function HojePage() {
                   return (
                     <div
                       key={habito.id}
-                      onClick={() => alternarHabitoNoDia(habito.id, hoje)}
+                      onClick={() => handleToggleHabito(habito)}
                       className={`group flex cursor-pointer flex-col gap-3 rounded-xl border p-4 transition-all ${
                         concluido 
                           ? 'border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10' 
@@ -193,7 +213,7 @@ export default function HojePage() {
                           {concluido ? <FaCheckCircle /> : <FiClock />}
                         </div>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                          {habito.horario}
+                          {habito.finalizar || '00:00'}
                         </span>
                       </div>
                       <span className={`font-medium transition-all ${concluido ? 'text-slate-400 line-through' : 'text-slate-200'}`}>
