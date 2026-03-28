@@ -3,7 +3,7 @@
 import { useTaskmind } from '@/app/providers';
 import { useActionState, useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import { FaPlus, FaTrashAlt, FaCheck, FaAlignLeft } from 'react-icons/fa';
 import { createTarefas, listTarefas, toggleTarefa, deleteTarefasDB, type ActionState } from '@/app/actions/tarefas';
 import Loading from '@/app/components/(app)/Loading';
 
@@ -117,6 +117,16 @@ export default function TarefasPage() {
               className="flex-1 bg-transparent px-1 py-2 text-lg text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
               disabled={isPending}
             />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
+              <FaAlignLeft className="h-4 w-4" />
+            </div>
+            <input
+              type="text"
+              name="descricao"
+              placeholder="Descrição da tarefa (opcional)"
+              className="flex-1 bg-transparent px-1 py-2 text-lg text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
+              disabled={isPending}
+            />
           </div>
           <button
             type="submit"
@@ -176,15 +186,20 @@ export default function TarefasPage() {
                       >
                         <FaCheck className={`h-3 w-3 text-white transition-opacity ${isFinalizada ? 'opacity-100' : 'opacity-0'}`} />
                       </div>
-                      <span
-                        className={`text-lg transition-all ${
-                          isFinalizada
-                            ? 'text-slate-500 line-through'
-                            : 'text-slate-200'
-                        }`}
-                      >
-                        {tarefa.titulo}
-                      </span>
+                      <div className="flex flex-col">
+                        <span
+                          className={`text-lg transition-all ${
+                            isFinalizada
+                              ? 'text-slate-500 line-through'
+                              : 'text-slate-200'
+                          }`}
+                        >
+                          {tarefa.titulo}
+                        </span>
+                        <p className="text-slate-500">
+                          {tarefa.descricao}
+                        </p>
+                      </div>
                     </div>
 
                     <button

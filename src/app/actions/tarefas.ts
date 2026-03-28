@@ -11,6 +11,7 @@ export type ActionState = {
 
 export async function createTarefas(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const titulo = formData.get('titulo') as string;
+  const descricao = formData.get('descricao') as string || null;
   const finalizar = formData.get('finalizar') as string || null;
   const finalizada = false;
 
@@ -44,6 +45,7 @@ export async function createTarefas(prevState: ActionState, formData: FormData):
         {
           titulo,
           finalizar,
+          descricao,
           finalizada,
           id_user: userData.id
         }

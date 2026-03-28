@@ -175,21 +175,7 @@ export default function LandingPage() {
           
           <div className="flex-1 w-full flex justify-center">
             {/* Mockup do App */}
-            <div className="relative w-full max-w-[500px] aspect-[16/10] bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-red-500/50" />
-                <div className="w-3 h-3 rounded-full bg-slate-800" />
-                <div className="w-3 h-3 rounded-full bg-slate-800" />
-              </div>
-              <div className="space-y-3">
-                <div className="h-8 w-1/3 bg-slate-900 rounded-lg animate-pulse" />
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="h-24 bg-red-500/5 rounded-xl border border-red-500/10" />
-                  <div className="h-24 bg-slate-900 rounded-xl border border-slate-800" />
-                </div>
-                <div className="h-32 bg-slate-900 rounded-xl border border-slate-800" />
-              </div>
-            </div>
+            <img src="readme.png" alt="" />
           </div>
         </div>
       </section>

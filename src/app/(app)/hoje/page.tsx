@@ -168,9 +168,14 @@ export default function HojePage() {
                             <div className="h-6 w-6 rounded-full border-2 border-slate-600 transition-colors group-hover:border-red-500" />
                           )}
                         </div>
-                        <span className={`text-lg transition-all ${isFinalizada ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
-                          {tarefa.titulo}
-                        </span>
+                        <div className="flex flex-col">
+                          <span className={`text-lg transition-all ${isFinalizada ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                            {tarefa.titulo}
+                          </span>
+                          <span className="text-sm text-slate-500">
+                            {tarefa.descricao}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
