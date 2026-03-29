@@ -104,3 +104,26 @@ export async function logout() {
   revalidatePath('/', 'layout')
   redirect('/login')
 }
+
+export async function getUser() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { user: null, error: 'Usuário não autenticado' }
+  }
+
+  const { data: userData, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', user.email)
+    .maybeSingle()
+
+  return {
+    user: {
+      ...user,
+      ...userData
+    },
+    error: error ? error.message : null
+  }
+}
