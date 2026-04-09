@@ -1,11 +1,12 @@
 'use client';
 
 import { useTaskmind } from '@/app/providers';
-import { useActionState, useEffect, useRef, useState, useCallback } from 'react';
+import { useActionState, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTrashAlt, FaCheck, FaAlignLeft } from 'react-icons/fa';
 import { createTarefas, listTarefas, toggleTarefa, deleteTarefasDB, type ActionState } from '@/app/actions/tarefas';
-import Loading from '@/app/components/(app)/Loading';
+import { BiTask } from 'react-icons/bi';
+import LoadingSkeleton from '@/app/components/(app)/LoadingSkeleton';
 
 export default function TarefasPage() {
   const { hoje } = useTaskmind();
@@ -15,7 +16,6 @@ export default function TarefasPage() {
   
   const formRef = useRef<HTMLFormElement>(null);
 
-  // O initialState DEVE ter o mesmo tipo que o retorno da Action
   const initialState: ActionState = {
     error: null,
     success: null,
@@ -76,136 +76,166 @@ export default function TarefasPage() {
     }
   };
 
+  const dataFormatada = useMemo(() => {
+    return new Date().toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+    });
+  }, []);
+
   if (!mounted) return null;
 
   return (
-    <section className="flex w-full flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-50 sm:text-3xl">
-          Minhas Tarefas
-        </h1>
-        <p className="text-slate-400">
-          Gerencie suas atividades do dia <span className="font-medium text-red-400">{hoje}</span>
-        </p>
+    <section className="flex w-full flex-col gap-10 pb-10">
+      <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-orange-400 text-white shadow-lg shadow-red-500/20">
+            <BiTask className="text-4xl" />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-bold tracking-tight text-white">Minhas Tarefas</h1>
+            <p className="text-slate-400">Gerenciando atividades de {dataFormatada}</p>
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-4 py-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-sm font-medium text-slate-300">{tarefasDB.length} tarefas ativas</span>
+        </div>
       </header>
 
       {state?.error && (
-        <div className="rounded-xl bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="rounded-2xl bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20"
+        >
           {state.error}
-        </div>
+        </motion.div>
       )}
 
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-slate-800/50 p-1 ring-1 ring-slate-800"
+        className="rounded-3xl bg-white/5 p-1 border border-white/10 backdrop-blur-md"
       >
         <form
           ref={formRef}
           action={formAction}
-          className="relative flex flex-col gap-2 rounded-xl p-4 sm:flex-row sm:items-center"
+          className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center"
         >
-          <div className="flex flex-1 items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
-              <FaPlus className="h-4 w-4" />
+          <div className="flex flex-1 flex-col gap-4 lg:flex-row">
+            <div className="flex flex-1 items-center gap-3 rounded-2xl bg-white/5 px-4 ring-1 ring-white/10 focus-within:ring-red-500/50 transition-all">
+              <FaPlus className="text-slate-500 text-sm" />
+              <input
+                type="text"
+                name="titulo"
+                required
+                placeholder="O que você precisa fazer?"
+                className="flex-1 bg-transparent py-3 text-white outline-none placeholder:text-slate-600"
+                disabled={isPending}
+              />
             </div>
-            <input
-              type="text"
-              name="titulo"
-              required
-              placeholder="O que você precisa fazer hoje?"
-              className="flex-1 bg-transparent px-1 py-2 text-lg text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
-              disabled={isPending}
-            />
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
-              <FaAlignLeft className="h-4 w-4" />
+            <div className="flex flex-1 items-center gap-3 rounded-2xl bg-white/5 px-4 ring-1 ring-white/10 focus-within:ring-red-500/50 transition-all">
+              <FaAlignLeft className="text-slate-500 text-sm" />
+              <input
+                type="text"
+                name="descricao"
+                placeholder="Descrição (opcional)"
+                className="flex-1 bg-transparent py-3 text-white outline-none placeholder:text-slate-600"
+                disabled={isPending}
+              />
             </div>
-            <input
-              type="text"
-              name="descricao"
-              placeholder="Descrição da tarefa (opcional)"
-              className="flex-1 bg-transparent px-1 py-2 text-lg text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
-              disabled={isPending}
-            />
           </div>
           <button
             type="submit"
             disabled={isPending}
-            className="group flex h-11 items-center justify-center gap-2 rounded-xl bg-red-600 px-6 font-semibold text-white shadow-lg shadow-red-900/20 transition-all hover:bg-red-500 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+            className="flex h-[48px] items-center justify-center gap-2 rounded-2xl bg-red-600 px-8 font-bold text-white shadow-lg shadow-red-900/20 transition-all hover:bg-red-500 active:scale-95 disabled:opacity-50"
           >
             <span>{isPending ? 'Adicionando...' : 'Adicionar'}</span>
-            <FaPlus className="h-3 w-3 transition-transform group-hover:rotate-90" />
+            <FaPlus className="text-xs" />
           </button>
         </form>
       </motion.div>
 
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
             Lista de tarefas
           </h2>
-          <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-300">
-            {tarefasDB.length} total
-          </span>
         </div>
 
         {carregando ? (
-          <Loading />
+          <LoadingSkeleton />
         ) : tarefasDB.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-800 py-16 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-slate-700">
-              <FaCheck className="h-6 w-6" />
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/5 p-16 text-center">
+            <div className="mb-4 rounded-full bg-white/5 p-6 text-slate-700">
+              <FaCheck className="text-4xl" />
             </div>
-            <p className="text-slate-500">
-              Tudo limpo por aqui! Nenhuma tarefa cadastrada.
-            </p>
+            <p className="text-lg font-medium text-slate-300">Tudo limpo por aqui!</p>
+            <p className="text-sm text-slate-500 mt-2">Nenhuma tarefa cadastrada para hoje.</p>
           </div>
         ) : (
           <ul className="grid gap-3">
             <AnimatePresence mode="popLayout">
               {tarefasDB.map(tarefa => {
                 const isFinalizada = tarefa.finalizada === true || tarefa.finalizada === "TRUE";
+                const dataCriacao = new Date(tarefa.created_at);
+                const hojeDate = new Date();
+                dataCriacao.setHours(0, 0, 0, 0);
+                hojeDate.setHours(0, 0, 0, 0);
+                const diffTime = hojeDate.getTime() - dataCriacao.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const isAtrasada = !isFinalizada && diffDays > 0;
+
                 return (
                   <motion.li
                     layout
                     key={tarefa.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
                     onClick={() => handleToggle(tarefa.id, tarefa.finalizada)}
-                    className="group flex items-center justify-between gap-4 rounded-xl border border-slate-800 bg-slate-900/30 p-4 transition-colors hover:border-slate-700 hover:bg-slate-900/50 cursor-pointer"
+                    className={`group flex items-center justify-between gap-4 rounded-2xl border p-4 transition-all duration-300 cursor-pointer ${
+                      isFinalizada 
+                        ? 'border-white/5 bg-white/[0.02] opacity-60' 
+                        : 'border-white/10 bg-white/5 hover:border-red-500/50 hover:bg-white/[0.08] hover:translate-x-1'
+                    }`}
                   >
                     <div className="flex flex-1 items-center gap-4">
-                      <div 
-                        onClick={() => handleToggle(tarefa.id, tarefa.finalizada)}
-                        className={`relative flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 transition-all ${
-                          isFinalizada 
-                            ? 'border-emerald-500 bg-emerald-500' 
-                            : 'border-slate-700 bg-slate-950'
-                        }`}
-                      >
-                        <FaCheck className={`h-3 w-3 text-white transition-opacity ${isFinalizada ? 'opacity-100' : 'opacity-0'}`} />
+                      <div className="relative flex items-center justify-center">
+                        {isFinalizada ? (
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                            <FaCheck className="h-3 w-3" />
+                          </div>
+                        ) : (
+                          <div className="h-7 w-7 rounded-full border-2 border-white/20 transition-all group-hover:border-red-500 group-hover:scale-110" />
+                        )}
                       </div>
                       <div className="flex flex-col">
-                        <span
-                          className={`text-lg transition-all ${
-                            isFinalizada
-                              ? 'text-slate-500 line-through'
-                              : 'text-slate-200'
-                          }`}
-                        >
+                        <span className={`text-lg font-medium transition-all ${isFinalizada ? 'text-slate-500 line-through' : 'text-slate-100'}`}>
                           {tarefa.titulo}
                         </span>
-                        <p className="text-slate-500">
-                          {tarefa.descricao}
-                        </p>
+                        {tarefa.descricao && (
+                          <p className="text-sm text-slate-500 line-clamp-1">
+                            {tarefa.descricao}
+                          </p>
+                        )}
+                        {isAtrasada && (
+                          <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-400/10 px-2 py-0.5 rounded-md self-start">
+                            Atrasada há {diffDays} {diffDays === 1 ? 'dia' : 'dias'}
+                          </span>
+                        )}
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(tarefa.id)}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(tarefa.id);
+                      }}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-500"
                     >
                       <FaTrashAlt className="h-4 w-4" />
                     </button>
