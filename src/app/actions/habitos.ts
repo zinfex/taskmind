@@ -6,20 +6,21 @@ import { revalidatePath } from "next/cache";
 export type ActionState = {
   error: string | null;
   success: boolean | null;
+  limitReached?: boolean;
   timestamp?: number;
 };
 
-async function getUserId(supabase: any) {
+async function getUserData(supabase: any) {
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) return null;
 
   const { data: userData } = await supabase
     .from("users")
-    .select("id")
+    .select("*")
     .eq("email", authData.user.email)
-    .single();
+    .maybeSingle();
 
-  return userData?.id || null;
+  return userData || null;
 }
 
 export async function createHabitos(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -32,10 +33,22 @@ export async function createHabitos(prevState: ActionState, formData: FormData):
 
   try {
     const supabase = await createClient();
-    const userId = await getUserId(supabase);
+    const userData = await getUserData(supabase);
 
-    if (!userId) {
+    if (!userData) {
       return { error: "Usuário não autenticado ou não encontrado.", success: null };
+    }
+
+    // Verificação de Limite PRO (4 hábitos)
+    if (!userData.is_pro) {
+      const { count, error: countError } = await supabase
+        .from("habitos")
+        .select("*", { count: 'exact', head: true })
+        .eq("id_user", userData.id);
+
+      if (!countError && count !== null && count >= 4) {
+        return { error: "Limite de hábitos atingido.", success: false, limitReached: true, timestamp: Date.now() };
+      }
     }
 
     const { error: insertError } = await supabase
@@ -44,7 +57,7 @@ export async function createHabitos(prevState: ActionState, formData: FormData):
         {
           titulo,
           finalizar,
-          id_user: userId
+          id_user: userData.id
         }
       ]);
 
@@ -63,16 +76,16 @@ export async function createHabitos(prevState: ActionState, formData: FormData):
 export async function listHabitos() {
   try {
     const supabase = await createClient();
-    const userId = await getUserId(supabase);
+    const userData = await getUserData(supabase);
 
-    if (!userId) {
+    if (!userData) {
       return { error: "Usuário não autenticado." };
     }
 
     const { data: habitos, error: queryError } = await supabase
       .from("habitos")
       .select("*")
-      .eq("id_user", userId)
+      .eq("id_user", userData.id)
       .order("id", { ascending: false });
 
     if (queryError) {
@@ -90,9 +103,9 @@ export async function toggleHabito(habito_id: number | string, novoStatus: boole
 
   try {
     const supabase = await createClient();
-    const userId = await getUserId(supabase);
+    const userData = await getUserData(supabase);
 
-    if (!userId) {
+    if (!userData) {
       return { error: "Usuário não autenticado." };
     }
 

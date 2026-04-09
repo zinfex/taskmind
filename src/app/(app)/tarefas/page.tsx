@@ -7,12 +7,14 @@ import { FaPlus, FaTrashAlt, FaCheck, FaAlignLeft } from 'react-icons/fa';
 import { createTarefas, listTarefas, toggleTarefa, deleteTarefasDB, type ActionState } from '@/app/actions/tarefas';
 import { BiTask } from 'react-icons/bi';
 import LoadingSkeleton from '@/app/components/(app)/LoadingSkeleton';
+import UpgradeModal from '@/app/components/(app)/UpgradeModal';
 
 export default function TarefasPage() {
   const { hoje } = useTaskmind();
   const [tarefasDB, setTarefasDB] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -46,6 +48,9 @@ export default function TarefasPage() {
     if (state?.success) {
       formRef.current?.reset();
       carregarTarefas();
+    }
+    if (state?.limitReached) {
+      setShowUpgradeModal(true);
     }
   }, [state, carregarTarefas]);
 
@@ -246,6 +251,13 @@ export default function TarefasPage() {
           </ul>
         )}
       </div>
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+        title="Limite de Tarefas Atingido"
+        description="No plano gratuito você pode criar até 3 tarefas. Assine o plano PRO para ter tarefas ilimitadas e organizar toda sua rotina sem restrições!"
+      />
     </section>
   );
 }

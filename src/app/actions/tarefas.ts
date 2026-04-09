@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 export type ActionState = {
   error: string | null;
   success: boolean | null;
+  limitReached?: boolean;
   timestamp?: number;
 };
 
@@ -29,14 +30,26 @@ export async function createTarefas(prevState: ActionState, formData: FormData):
 
     const email = authData.user.email;
 
-    const { data: userData, error: userError } = await supabase
+    const { data: userData } = await supabase
       .from("users")
-      .select("id")
+      .select("*")
       .eq("email", email)
-      .single();
+      .maybeSingle();
 
-    if (userError || !userData) {
+    if (!userData) {
       return { error: "Usuário não encontrado no banco.", success: null };
+    }
+
+    // Verificação de Limite PRO (3 tarefas)
+    if (!userData.is_pro) {
+      const { count, error: countError } = await supabase
+        .from("tarefas")
+        .select("*", { count: 'exact', head: true })
+        .eq("id_user", userData.id);
+
+      if (!countError && count !== null && count >= 3) {
+        return { error: "Limite de tarefas atingido.", success: false, limitReached: true, timestamp: Date.now() };
+      }
     }
 
     const { error: insertError } = await supabase
@@ -73,13 +86,13 @@ export async function listTarefas() {
     }
 
     const email = authData.user.email;
-    const { data: userData, error: userError } = await supabase
+    const { data: userData } = await supabase
       .from("users")
-      .select("id")
+      .select("*")
       .eq("email", email)
-      .single();
+      .maybeSingle();
 
-    if (userError || !userData) {
+    if (!userData) {
       return { error: "Usuário não encontrado." };
     }
 

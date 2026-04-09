@@ -7,6 +7,7 @@ import { FaRegTrashAlt, FaPlus, FaCalendarAlt, FaChevronLeft, FaChevronRight, Fa
 import { ActionState, createHabitos, deleteHabitosDB, listHabitos, toggleHabito } from '@/app/actions/habitos';
 import { FiRefreshCcw } from 'react-icons/fi';
 import LoadingSkeleton from '@/app/components/(app)/LoadingSkeleton';
+import UpgradeModal from '@/app/components/(app)/UpgradeModal';
 
 function toISODate(d: Date) {
   const ano = d.getFullYear();
@@ -40,6 +41,7 @@ export default function HabitosPage() {
   const [habitosDB, setHabitosDB] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -75,6 +77,9 @@ export default function HabitosPage() {
       setTitulo('');
       setHorario('07:00');
       carregarHabitos();
+    }
+    if (state?.limitReached) {
+      setShowUpgradeModal(true);
     }
   }, [state, carregarHabitos]);
 
@@ -321,6 +326,13 @@ export default function HabitosPage() {
           </div>
         )}
       </div>
+
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+        title="Limite de Hábitos Atingido"
+        description="No plano gratuito você pode criar até 4 hábitos diários. Assine o plano PRO para ter hábitos ilimitados e construir uma rotina de alta performance!"
+      />
     </section>
   );
 }
